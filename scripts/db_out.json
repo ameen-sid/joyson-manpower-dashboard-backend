@@ -1,0 +1,252 @@
+[
+  {
+    "EmployeeCode": "EMP004",
+    "formatted_date": "2026-02-26",
+    "Status": "HalfDay"
+  },
+  {
+    "EmployeeCode": "EMP003",
+    "formatted_date": "2026-02-26",
+    "Status": "Leave"
+  },
+  {
+    "EmployeeCode": "EMP002",
+    "formatted_date": "2026-02-26",
+    "Status": "Absent"
+  },
+  {
+    "EmployeeCode": "EMP001",
+    "formatted_date": "2026-02-26",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "EMP004",
+    "formatted_date": "2024-10-25",
+    "Status": "HalfDay"
+  },
+  {
+    "EmployeeCode": "EMP003",
+    "formatted_date": "2024-10-25",
+    "Status": "Leave"
+  },
+  {
+    "EmployeeCode": "EMP002",
+    "formatted_date": "2024-10-25",
+    "Status": "Absent"
+  },
+  {
+    "EmployeeCode": "EMP001",
+    "formatted_date": "2024-10-25",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "AE0945",
+    "formatted_date": "2026-02-10",
+    "Status": "Leave"
+  },
+  {
+    "EmployeeCode": "AE0944",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "AE0943",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "AE0942",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "AE0941",
+    "formatted_date": "2026-02-10",
+    "Status": "HalfDay"
+  },
+  {
+    "EmployeeCode": "NPS0460",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "NPS0444",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "NPS0441",
+    "formatted_date": "2026-02-10",
+    "Status": "Absent"
+  },
+  {
+    "EmployeeCode": "NPS0433",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "NPS0429",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "NPS0426",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "NPS0418",
+    "formatted_date": "2026-02-10",
+    "Status": "Absent"
+  },
+  {
+    "EmployeeCode": "NPS0416",
+    "formatted_date": "2026-02-10",
+    "Status": "Absent"
+  },
+  {
+    "EmployeeCode": "NPS0411",
+    "formatted_date": "2026-02-10",
+    "Status": "HalfDay"
+  },
+  {
+    "EmployeeCode": "NPS0408",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "NPS0407",
+    "formatted_date": "2026-02-10",
+    "Status": "HalfDay"
+  },
+  {
+    "EmployeeCode": "NPS0406",
+    "formatted_date": "2026-02-10",
+    "Status": "Leave"
+  },
+  {
+    "EmployeeCode": "AE0940",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "AE0939",
+    "formatted_date": "2026-02-10",
+    "Status": "Leave"
+  },
+  {
+    "EmployeeCode": "AE0938",
+    "formatted_date": "2026-02-10",
+    "Status": "Absent"
+  },
+  {
+    "EmployeeCode": "AE0937",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "AE0936",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "AE0935",
+    "formatted_date": "2026-02-10",
+    "Status": "Absent"
+  },
+  {
+    "EmployeeCode": "AE0930",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "AE0929",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "AE0857",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "AE0928",
+    "formatted_date": "2026-02-10",
+    "Status": "Absent"
+  },
+  {
+    "EmployeeCode": "AE0926",
+    "formatted_date": "2026-02-10",
+    "Status": "Absent"
+  },
+  {
+    "EmployeeCode": "AE0925",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "AE0924",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "AE0922",
+    "formatted_date": "2026-02-10",
+    "Status": "HalfDay"
+  },
+  {
+    "EmployeeCode": "AE0918",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "AE0917",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "AE0916",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "AE0915",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "AE0914",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "AE0913",
+    "formatted_date": "2026-02-10",
+    "Status": "Leave"
+  },
+  {
+    "EmployeeCode": "AE0911",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "AE0909",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "AE0903",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  },
+  {
+    "EmployeeCode": "AE0902",
+    "formatted_date": "2026-02-10",
+    "Status": "Leave"
+  },
+  {
+    "EmployeeCode": "AE0901",
+    "formatted_date": "2026-02-10",
+    "Status": "Present"
+  }
+]

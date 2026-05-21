@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import db from '../config/db.js';
 
-// Login Controller
 export const login = async (req, res) => {
     try {
 
@@ -53,7 +52,6 @@ export const login = async (req, res) => {
                 username: user.username
             }
         });
-
     } catch (error) {
         console.error('Login error:', error);
         return res.status(500).json({
@@ -63,7 +61,6 @@ export const login = async (req, res) => {
     }
 };
 
-// Logout Controller
 export const logout = (req, res) => {
     res.clearCookie('token');
     return res.json({ 
@@ -72,9 +69,7 @@ export const logout = (req, res) => {
     });
 };
 
-// Check Auth Controller (Session Verification)
 export const checkAuth = (req, res) => {
-    // req.user is populated by authenticateToken middleware
     return res.json({ 
         success: true, 
         user: req.user 

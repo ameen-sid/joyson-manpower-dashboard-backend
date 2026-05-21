@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 
 export const authenticateToken = (req, res, next) => {
-    // Check header (for testing/mobile) OR cookie (for web)
     const token = req.cookies.token || (req.headers['authorization'] && req.headers['authorization'].split(' ')[1]);
     if (!token) {
         return res.status(401).json({ 

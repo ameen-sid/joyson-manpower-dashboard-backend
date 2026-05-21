@@ -18,7 +18,11 @@
 		"dotenv": "^17.2.3",
 		"express": "^5.2.1",
 		"jsonwebtoken": "^9.0.3",
+		"mssql": "^12.5.4",
+		"multer": "^2.0.2",
 		"mysql2": "^3.16.1",
-		"nodemon": "^3.1.11"
+		"node-cron": "^4.2.1",
+		"nodemon": "^3.1.11",
+		"xlsx": "^0.18.5"
 	}
 }
