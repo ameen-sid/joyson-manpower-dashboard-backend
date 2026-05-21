@@ -7,6 +7,7 @@ import authRoutes from './routes/authRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import { initializeSchedulers } from './services/attendanceSyncService.js';
+import { initializeDatabase } from './services/dbInitService.js';
 
 dotenv.config();
 
@@ -48,8 +49,10 @@ app.get('/api/db-test', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     console.log(`Server running on port ${PORT}`);
+    // Safe automatic database schema initialization
+    await initializeDatabase();
     // Start automated schedulers for external MSSQL rawpunch sync
     initializeSchedulers();
 });
