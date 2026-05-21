@@ -15,7 +15,27 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-    origin: [process.env.FRONTEND_URL, 'http://localhost:5173'],
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps, curl, or postman)
+        if (!origin) return callback(null, true);
+
+        const allowedOrigins = [
+            process.env.FRONTEND_URL,
+            'http://localhost:5175',
+            'http://localhost:5173',
+            'http://127.0.0.1:5175',
+            'http://127.0.0.1:5173'
+        ];
+
+        // Dynamically allow any local network IP origin (e.g. 192.168.x.x, 10.x.x.x, 172.x.x.x)
+        const isLocalIP = origin.startsWith('http://192.168.') || origin.startsWith('http://10.') || origin.startsWith('http://172.');
+
+        if (allowedOrigins.includes(origin) || isLocalIP) {
+            callback(null, true);
+        } else {
+            callback(null, false); // Standard safe rejection, does not throw 500 errors
+        }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
