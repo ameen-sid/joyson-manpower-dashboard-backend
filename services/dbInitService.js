@@ -115,6 +115,7 @@ export const initializeDatabase = async () => {
                 EmployeeCode VARCHAR(50),
                 Date DATE,
                 Status ENUM('Present', 'Absent', 'Leave', 'HalfDay') DEFAULT 'Present',
+                PunchingTime DATETIME DEFAULT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
         `);
@@ -168,6 +169,13 @@ export const initializeDatabase = async () => {
             }
             await db.query("ALTER TABLE daily_required_manpower ADD UNIQUE KEY unique_daily_req (date, department, section, line, shift)");
             console.log('[Database Init] Created shift-inclusive unique index on daily_required_manpower.');
+        }
+
+        // 4. Add PunchingTime column to attendance table
+        const [attendanceCols] = await db.query("SHOW COLUMNS FROM attendance LIKE 'PunchingTime'");
+        if (attendanceCols.length === 0) {
+            await db.query("ALTER TABLE attendance ADD COLUMN PunchingTime DATETIME DEFAULT NULL;");
+            console.log('[Database Init] Added PunchingTime column to attendance table.');
         }
 
         console.log('[Database Init] Safe database verification completed successfully.');

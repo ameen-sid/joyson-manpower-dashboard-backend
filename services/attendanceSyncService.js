@@ -48,6 +48,20 @@ export const syncRawPunches = async (startDateTime, endDateTime) => {
             return { success: true, synced: 0 };
         }
 
+        // Get MySQL Connection first to query headcount
+        const mySqlConnection = await db.getConnection();
+        let validEmpIDs = new Set();
+        try {
+            const [headcountRows] = await mySqlConnection.query(
+                "SELECT DISTINCT EmpID FROM headcountdataneemranaplant WHERE EmpID IS NOT NULL AND EmpID != ''"
+            );
+            validEmpIDs = new Set(headcountRows.map(r => r.EmpID.toString().trim()));
+        } catch (hcErr) {
+            console.error('[Sync Service] Failed to fetch active headcount EmpIDs:', hcErr);
+            mySqlConnection.release();
+            throw hcErr;
+        }
+
         // 2. Group punches by EmployeeCode (cardno) and Date (YYYY-MM-DD)
         const punchMap = new Map();
 
@@ -57,27 +71,35 @@ export const syncRawPunches = async (startDateTime, endDateTime) => {
 
             if (!empCode || !punchTime) return;
 
+            // Filter: Only process attendance records if employee cardno exists in headcount Emp.ID
+            if (!validEmpIDs.has(empCode)) return;
+
             const dateStr = toLocalDateString(new Date(punchTime));
             const key = `${empCode}_${dateStr}`;
 
-            // We only need the presence of a punch on that date
+            // Store the earliest punch of the day
             if (!punchMap.has(key)) {
-                punchMap.set(key, { empCode, dateStr });
+                punchMap.set(key, { empCode, dateStr, punchTime });
             }
         });
 
-        console.log(`[Sync Service] Found ${punchMap.size} unique employee-day punch records to process.`);
+        console.log(`[Sync Service] Found ${punchMap.size} unique employee-day punch records matching headcount to process.`);
+
+        if (punchMap.size === 0) {
+            console.log('[Sync Service] No valid headcount punches to sync after filtering.');
+            mySqlConnection.release();
+            return { success: true, synced: 0 };
+        }
 
         // 3. Ingest into MySQL attendance table
         let insertedCount = 0;
         let updatedCount = 0;
 
-        const mySqlConnection = await db.getConnection();
         await mySqlConnection.beginTransaction();
 
         try {
             for (const [key, record] of punchMap.entries()) {
-                const { empCode, dateStr } = record;
+                const { empCode, dateStr, punchTime } = record;
 
                 // Check if an attendance record already exists for this card number and date
                 const [existing] = await mySqlConnection.query(
@@ -87,19 +109,19 @@ export const syncRawPunches = async (startDateTime, endDateTime) => {
 
                 if (existing.length > 0) {
                     const currentStatus = existing[0].Status;
-                    // If employee was marked Absent or HalfDay, or state is blank, update to Present
+                    // If employee was marked Absent or HalfDay, or state is blank, update to Present and store punching time
                     if (currentStatus !== 'Present') {
                         await mySqlConnection.query(
-                            "UPDATE attendance SET Status = 'Present' WHERE id = ?",
-                            [existing[0].id]
+                            "UPDATE attendance SET Status = 'Present', PunchingTime = ? WHERE id = ?",
+                            [punchTime, existing[0].id]
                         );
                         updatedCount++;
                     }
                 } else {
-                    // Create new attendance record
+                    // Create new attendance record with punching time
                     await mySqlConnection.query(
-                        "INSERT INTO attendance (EmployeeCode, Date, Status) VALUES (?, ?, 'Present')",
-                        [empCode, dateStr]
+                        "INSERT INTO attendance (EmployeeCode, Date, Status, PunchingTime) VALUES (?, ?, 'Present', ?)",
+                        [empCode, dateStr, punchTime]
                     );
                     insertedCount++;
                 }
