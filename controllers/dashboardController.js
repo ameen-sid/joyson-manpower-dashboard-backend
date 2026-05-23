@@ -573,11 +573,41 @@ export const getAttritionStats = async (req, res) => {
         const [activeRows] = await db.query(`SELECT COUNT(DISTINCT h.EmpID) as pf ${activeFrom} WHERE ${activeWhere} `, activeParams);
         const currentForce = activeRows[0].pf || 1;
 
-        const data = leaverRows.map(row => ({
-            period: row.period,
-            rate: ((row.leavers / currentForce) * 100).toFixed(1),
-            type: isDaily ? 'Daily' : 'Monthly'
-        }));
+        // Generate all periods between sDate and eDate to ensure we return 0.0% even when there are no leavers
+        const periods = [];
+        const targetEnd = new Date(eDate);
+
+        if (isDaily) {
+            let runDate = new Date(sDate);
+            while (runDate <= targetEnd) {
+                const yr = runDate.getFullYear();
+                const mo = String(runDate.getMonth() + 1).padStart(2, '0');
+                const dy = String(runDate.getDate()).padStart(2, '0');
+                periods.push(`${yr}-${mo}-${dy}`);
+                runDate.setDate(runDate.getDate() + 1);
+            }
+        } else {
+            let runDate = new Date(sDate.getFullYear(), sDate.getMonth(), 1);
+            const endYear = targetEnd.getFullYear();
+            const endMonth = targetEnd.getMonth();
+            while (runDate.getFullYear() < endYear || (runDate.getFullYear() === endYear && runDate.getMonth() <= endMonth)) {
+                const yr = runDate.getFullYear();
+                const mo = String(runDate.getMonth() + 1).padStart(2, '0');
+                periods.push(`${yr}-${mo}`);
+                runDate.setMonth(runDate.getMonth() + 1);
+            }
+        }
+
+        const data = periods.map(periodStr => {
+            const row = leaverRows.find(r => r.period === periodStr);
+            const leavers = row ? row.leavers : 0;
+            const rate = ((leavers / currentForce) * 100).toFixed(1);
+            return {
+                period: periodStr,
+                rate: rate,
+                type: isDaily ? 'Daily' : 'Monthly'
+            };
+        });
 
         return res.json(data);
     } catch (error) {

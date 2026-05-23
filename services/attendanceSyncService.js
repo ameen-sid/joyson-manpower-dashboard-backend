@@ -16,13 +16,32 @@ const toLocalDateString = (date) => {
  */
 export const syncRawPunches = async (startDateTime, endDateTime) => {
 
-    console.log(`[Sync Service] Starting punch sync between ${startDateTime.toISOString()} and ${endDateTime.toISOString()}...`);
+    console.log(`[Sync Service] Starting punch sync between ${startDateTime.toLocaleString()} and ${endDateTime.toLocaleString()}...`);
     let mssqlPool;
     try {
         mssqlPool = await getMssqlConnection();
     } catch (err) {
         console.warn('[Sync Service] MSSQL not reachable or unconfigured. Skipping punch fetch.', err.message);
         return { success: false, reason: 'MSSQL_CONNECTION_FAILED' };
+    }
+
+    let actualStart = startDateTime;
+    try {
+        const todayStr = toLocalDateString(new Date());
+        const [rows] = await db.query(
+            "SELECT MAX(PunchingTime) as lastPunchTime FROM attendance WHERE Date = ? AND PunchingTime IS NOT NULL",
+            [todayStr]
+        );
+        if (rows && rows[0] && rows[0].lastPunchTime) {
+            const dbLastPunch = new Date(rows[0].lastPunchTime);
+            if (dbLastPunch > startDateTime) {
+                // Offset by 1 second to only fetch subsequent new punches
+                actualStart = new Date(dbLastPunch.getTime() + 1000);
+                console.log(`[Sync Service] Resuming sync from last recorded punch: ${dbLastPunch.toLocaleString()}. Adjusted scan start to: ${actualStart.toLocaleString()}`);
+            }
+        }
+    } catch (dbErr) {
+        console.warn('[Sync Service] Could not fetch latest punch time from local MySQL, using default start boundary:', dbErr.message);
     }
 
     try {
@@ -35,7 +54,7 @@ export const syncRawPunches = async (startDateTime, endDateTime) => {
         `;
 
         const request = mssqlPool.request();
-        request.input('startTime', sql.DateTime, startDateTime);
+        request.input('startTime', sql.DateTime, actualStart);
         request.input('endTime', sql.DateTime, endDateTime);
 
         const result = await request.query(query);
@@ -199,22 +218,34 @@ export const reconcileAbsenteeism = async () => {
 export const initializeSchedulers = () => {
 
     console.log('[Sync Service] Initializing Automated Schedulers...');
-    // 1. Cron Job: Sync punches every 10 minutes
-    // Runs */10 * * * * (Every 10 minutes, e.g. 0, 10, 20, 30...)
-    cron.schedule('*/10 * * * *', async () => {
-        const end = new Date();
+
+    // Dynamic helper to fetch and process today's punches
+    const triggerSync = async () => {
         const start = new Date();
-        start.setDate(start.getDate() - 1); // Fetch starting from 24 hours ago to cover shift transition gaps safely
+        start.setHours(0, 0, 0, 0); // Start of today (00:00:00)
+
+        const end = new Date();
+        end.setHours(23, 59, 59, 999); // End of today (23:59:59)
 
         try {
             await syncRawPunches(start, end);
         } catch (err) {
-            console.error('[Sync Schedulers] Failed to execute periodic punch sync cron:', err.message);
+            console.error('[Sync Schedulers] Failed to execute periodic punch sync:', err.message);
         }
+    };
+
+    // 1. Run sync immediately on startup
+    console.log('[Sync Service] Executing initial raw punch sync immediately...');
+    triggerSync();
+
+    // 2. Cron Job: Sync punches every 10 minutes
+    // Runs */10 * * * * (Every 10 minutes, e.g. 0, 10, 20, 30...)
+    cron.schedule('*/10 * * * *', async () => {
+        await triggerSync();
     });
     console.log('[Sync Service] Scheduled task: Raw Punch Sync runs every 10 minutes.');
 
-    // 2. Cron Job: Nightly absenteeism mark
+    // 3. Cron Job: Nightly absenteeism mark
     // Runs daily at 23:55 (55 23 * * *)
     cron.schedule('55 23 * * *', async () => {
         try {

@@ -12,7 +12,8 @@ const config = {
     options: {
         encrypt: process.env.MSSQL_ENCRYPT === 'true',
         trustServerCertificate: true, 
-        enableArithAbort: true
+        enableArithAbort: true,
+        useUTC: false
     },
     pool: {
         max: 10,

@@ -179,6 +179,20 @@ export const initializeDatabase = async () => {
             console.log('[Database Init] Added PunchingTime column to attendance table.');
         }
 
+        // 5. Automatic timezone fix for legacy future-shifted timestamps
+        try {
+            const [cleanupRes] = await db.query(`
+                UPDATE attendance 
+                SET PunchingTime = DATE_SUB(PunchingTime, INTERVAL 330 MINUTE) 
+                WHERE Date = CURDATE() AND PunchingTime > NOW()
+            `);
+            if (cleanupRes.affectedRows > 0) {
+                console.log(`[Database Init] Fixed ${cleanupRes.affectedRows} future-shifted attendance timestamps for today.`);
+            }
+        } catch (cleanupErr) {
+            console.error('[Database Init] Failed to run attendance timezone cleanup:', cleanupErr.message);
+        }
+
         console.log('[Database Init] Safe database verification completed successfully.');
     } catch (error) {
         console.error('[Database Init] Error verifying database tables:', error);
