@@ -11,7 +11,7 @@ const config = {
     port: parseInt(process.env.MSSQL_PORT) || 1433,
     options: {
         encrypt: process.env.MSSQL_ENCRYPT === 'true',
-        trustServerCertificate: true, // true for local dev
+        trustServerCertificate: true, 
         enableArithAbort: true
     },
     pool: {
@@ -24,15 +24,15 @@ const config = {
 let pool = null;
 
 export const getMssqlConnection = async () => {
-    if (pool) return pool;
 
+    if (pool) return pool;
     try {
         pool = await new sql.ConnectionPool(config).connect();
         console.log('Successfully connected to MSSQL Database');
         return pool;
     } catch (err) {
         console.error('MSSQL Connection Pool creation failed:', err.message);
-        pool = null; // Reset so next call will try to connect again
+        pool = null;
         throw err;
     }
 };

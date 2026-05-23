@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import db from '../config/db.js';
 
 export const initializeDatabase = async () => {
+
     console.log('[Database Init] Starting safe database table verification...');
     try {
         // 1. users table

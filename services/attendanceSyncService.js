@@ -15,8 +15,8 @@ const toLocalDateString = (date) => {
  * @param {Date} endDateTime - Ending timestamp to scan punches
  */
 export const syncRawPunches = async (startDateTime, endDateTime) => {
-    console.log(`[Sync Service] Starting punch sync between ${startDateTime.toISOString()} and ${endDateTime.toISOString()}...`);
 
+    console.log(`[Sync Service] Starting punch sync between ${startDateTime.toISOString()} and ${endDateTime.toISOString()}...`);
     let mssqlPool;
     try {
         mssqlPool = await getMssqlConnection();
@@ -42,7 +42,6 @@ export const syncRawPunches = async (startDateTime, endDateTime) => {
         const punches = result.recordset;
 
         console.log(`[Sync Service] Fetched ${punches.length} raw punches from MSSQL.`);
-
         if (punches.length === 0) {
             console.log('[Sync Service] No new punches found to sync.');
             return { success: true, synced: 0 };
@@ -64,13 +63,12 @@ export const syncRawPunches = async (startDateTime, endDateTime) => {
 
         // 2. Group punches by EmployeeCode (cardno) and Date (YYYY-MM-DD)
         const punchMap = new Map();
-
         punches.forEach(punch => {
+
             const empCode = punch.cardno?.toString().trim();
             const punchTime = punch.officepunch;
 
             if (!empCode || !punchTime) return;
-
             // Filter: Only process attendance records if employee cardno exists in headcount Emp.ID
             if (!validEmpIDs.has(empCode)) return;
 
@@ -84,7 +82,6 @@ export const syncRawPunches = async (startDateTime, endDateTime) => {
         });
 
         console.log(`[Sync Service] Found ${punchMap.size} unique employee-day punch records matching headcount to process.`);
-
         if (punchMap.size === 0) {
             console.log('[Sync Service] No valid headcount punches to sync after filtering.');
             mySqlConnection.release();
@@ -96,7 +93,6 @@ export const syncRawPunches = async (startDateTime, endDateTime) => {
         let updatedCount = 0;
 
         await mySqlConnection.beginTransaction();
-
         try {
             for (const [key, record] of punchMap.entries()) {
                 const { empCode, dateStr, punchTime } = record;
@@ -136,9 +132,7 @@ export const syncRawPunches = async (startDateTime, endDateTime) => {
         } finally {
             mySqlConnection.release();
         }
-
         return { success: true, synced: punchMap.size, insertedCount, updatedCount };
-
     } catch (error) {
         console.error('[Sync Service] Error executing syncRawPunches:', error);
         return { success: false, error: error.message };
@@ -149,13 +143,13 @@ export const syncRawPunches = async (startDateTime, endDateTime) => {
  * Reconcile Absenteeism: Identify active employees with zero punches for today and record them as 'Absent'
  */
 export const reconcileAbsenteeism = async () => {
+
     const todayStr = toLocalDateString(new Date());
     console.log(`[Sync Service] Starting nightly absenteeism reconciliation for date: ${todayStr}...`);
-
     try {
+
         const mySqlConnection = await db.getConnection();
         await mySqlConnection.beginTransaction();
-
         try {
             // 1. Fetch all active employees from employee master headcount roster
             const [activeEmployees] = await mySqlConnection.query(
@@ -172,11 +166,10 @@ export const reconcileAbsenteeism = async () => {
             const markedEmployees = new Set(attendanceRecords.map(r => r.EmployeeCode.toString().trim()));
 
             let absentCount = 0;
-
             // 3. For each active employee, if they have no attendance status logged, mark them as Absent
             for (const employee of activeEmployees) {
-                const empCode = employee.EmpID.toString().trim();
 
+                const empCode = employee.EmpID.toString().trim();
                 if (!markedEmployees.has(empCode)) {
                     await mySqlConnection.query(
                         "INSERT INTO attendance (EmployeeCode, Date, Status) VALUES (?, ?, 'Absent')",
@@ -195,7 +188,6 @@ export const reconcileAbsenteeism = async () => {
         } finally {
             mySqlConnection.release();
         }
-
     } catch (error) {
         console.error('[Sync Service] General error during absenteeism reconciliation:', error);
     }
@@ -205,8 +197,8 @@ export const reconcileAbsenteeism = async () => {
  * Initialize all Cron Jobs
  */
 export const initializeSchedulers = () => {
-    console.log('[Sync Service] Initializing Automated Schedulers...');
 
+    console.log('[Sync Service] Initializing Automated Schedulers...');
     // 1. Cron Job: Sync punches every 10 minutes
     // Runs */10 * * * * (Every 10 minutes, e.g. 0, 10, 20, 30...)
     cron.schedule('*/10 * * * *', async () => {

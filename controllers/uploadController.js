@@ -3,9 +3,8 @@ import db from '../config/db.js';
 
 export const uploadAttendance = async (req, res) => {
     try {
-        if (!req.file) {
-            return res.status(400).json({ success: false, message: 'No file uploaded.' });
-        }
+
+        if (!req.file)  return res.status(400).json({ success: false, message: 'No file uploaded.' });
 
         // 1. Read the Excel buffer
         const workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
@@ -15,21 +14,19 @@ export const uploadAttendance = async (req, res) => {
         // 2. Convert to JSON with raw dates (to handle Excel serial numbers correctly)
         // raw: false converts dates to formatted strings based on Excel cell format (e.g., '10/25/24')
         const data = xlsx.utils.sheet_to_json(sheet, { defval: '' });
-
-        if (data.length === 0) {
-            return res.status(400).json({ success: false, message: 'The Excel file is empty.' });
-        }
+        if (data.length === 0)  return res.status(400).json({ success: false, message: 'The Excel file is empty.' });
 
         const connection = await db.getConnection();
         await connection.beginTransaction();
-
         try {
+
             let insertedCount = 0;
             let updatedCount = 0;
             const errors = [];
 
             // 3. Process each row
             for (let i = 0; i < data.length; i++) {
+
                 const row = data[i];
                 const rowNum = i + 2; // +2 because 0-index and header row
 
@@ -101,20 +98,17 @@ export const uploadAttendance = async (req, res) => {
             }
 
             await connection.commit();
-
             return res.json({
                 success: true,
                 message: `Successfully processed file. Inserted: ${insertedCount}, Updated: ${updatedCount}.`,
                 errors: errors.length > 0 ? errors : undefined // Include non-fatal errors if any rows succeeded
             });
-
         } catch (dbError) {
             await connection.rollback();
             throw dbError; // Caught by outer block
         } finally {
             connection.release();
         }
-
     } catch (error) {
         console.error('Error uploading attendance:', error);
         return res.status(500).json({ success: false, message: 'Internal server error while processing the Excel file.' });
@@ -139,6 +133,7 @@ const parseExcelDate = (dateVal) => {
 // Generic Upload Handler Template
 const processMasterUpload = async (req, res, tableName, requiredKeys, rowMapper) => {
     try {
+
         if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded.' });
 
         const workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
@@ -159,8 +154,8 @@ const processMasterUpload = async (req, res, tableName, requiredKeys, rowMapper)
 
         const connection = await db.getConnection();
         await connection.beginTransaction();
-
         try {
+
             // TRUNCATE to replace master data entirely
             await connection.query(`TRUNCATE TABLE ${tableName}`);
 
@@ -170,6 +165,7 @@ const processMasterUpload = async (req, res, tableName, requiredKeys, rowMapper)
             // Execute Inserts sequentially to map data carefully
             for (let i = 0; i < data.length; i++) {
                 try {
+
                     const rowData = rowMapper(data[i]);
                     const cols = Object.keys(rowData);
                     const placeholders = cols.map(() => '?').join(', ');
@@ -194,14 +190,12 @@ const processMasterUpload = async (req, res, tableName, requiredKeys, rowMapper)
                 message: `Successfully replaced ${tableName} with ${insertedCount} records.`,
                 errors: errors.length > 0 ? errors : undefined
             });
-
         } catch (dbError) {
             await connection.rollback();
             throw dbError;
         } finally {
             connection.release();
         }
-
     } catch (error) {
         console.error(`Error uploading ${tableName}:`, error);
         return res.status(500).json({ success: false, message: 'Internal server error processing Excel.' });

@@ -78,7 +78,8 @@ export const getManpowerStats = async (req, res) => {
         console.error('Error fetching manpower stats:', error);
         return res.status(500).json({
             success: false,
-            message: 'Error fetching manpower stats'
+            message: 'Error fetching manpower stats',
+            error: error.message
         });
     }
 };
@@ -176,7 +177,8 @@ export const getSkillMatrix = async (req, res) => {
         console.error('Error fetching skill matrix:', error);
         return res.status(500).json({
             success: false,
-            message: 'Error fetching skill matrix'
+            message: 'Error fetching skill matrix',
+            error: error.message
         });
     }
 };
@@ -202,7 +204,8 @@ export const getFilterOptions = async (req, res) => {
         console.error('Error fetching filter options:', error);
         return res.status(500).json({
             success: false,
-            message: 'Error fetching filter options'
+            message: 'Error fetching filter options',
+            error: error.message
         });
     }
 };
@@ -306,7 +309,7 @@ export const getManpowerTrend = async (req, res) => {
         return res.json(data);
     } catch (error) {
         console.error('Error fetching manpower trend:', error);
-        return res.status(500).json({ success: false, message: 'Error fetching manpower trend' });
+        return res.status(500).json({ success: false, message: 'Error fetching manpower trend', error: error.message });
     }
 };
 
@@ -362,7 +365,7 @@ export const getAbsenteeismTrend = async (req, res) => {
         return res.json(data);
     } catch (error) {
         console.error('Error fetching absenteeism trend:', error);
-        return res.status(500).json({ success: false, message: 'Error fetching absenteeism trend' });
+        return res.status(500).json({ success: false, message: 'Error fetching absenteeism trend', error: error.message });
     }
 };
 
@@ -401,7 +404,7 @@ export const getDojoStats = async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching Dojo stats:', error);
-        return res.status(500).json({ success: false, message: 'Error fetching Dojo stats' });
+        return res.status(500).json({ success: false, message: 'Error fetching Dojo stats', error: error.message });
     }
 };
 
@@ -472,7 +475,7 @@ export const getDojoTrend = async (req, res) => {
         return res.json(data);
     } catch (error) {
         console.error('Error fetching Dojo trend:', error);
-        return res.status(500).json({ success: false, message: 'Error fetching Dojo trend' });
+        return res.status(500).json({ success: false, message: 'Error fetching Dojo trend', error: error.message });
     }
 };
 
@@ -579,7 +582,7 @@ export const getAttritionStats = async (req, res) => {
         return res.json(data);
     } catch (error) {
         console.error('Error fetching attrition stats:', error);
-        return res.status(500).json({ success: false, message: 'Error fetching attrition stats' });
+        return res.status(500).json({ success: false, message: 'Error fetching attrition stats', error: error.message });
     }
 };
 
@@ -620,7 +623,7 @@ export const setRequiredManpower = async (req, res) => {
         return res.json({ success: true, message: 'Required manpower levels updated successfully' });
     } catch (error) {
         console.error('Error setting required manpower:', error);
-        return res.status(500).json({ success: false, message: 'Server error updating required manpower' });
+        return res.status(500).json({ success: false, message: 'Server error updating required manpower', error: error.message });
     }
 };
 
